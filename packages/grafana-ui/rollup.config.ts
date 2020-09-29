@@ -10,7 +10,7 @@ const libraryName = pkg.name;
 
 const buildCjsPackage = ({ env }) => {
   return {
-    input: `compiled/index.js`,
+    input: `compiled/packages/grafana-ui/src/index.js`,
     output: [
       {
         dir: 'dist',

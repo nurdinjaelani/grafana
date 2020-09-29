@@ -51,12 +51,12 @@ const moveFiles = (fromPath: string, toPath: string) => {
   });
 };
 
-const moveStaticFiles = async (packageRoot: string, pkg: any) => {
+const moveStaticFiles = async (packageRoot: string, pkg: any, relativePackageRoot: string) => {
   if (pkg.name.endsWith('/ui')) {
     return useSpinner('Moving static files', async () => {
       const staticFiles = await globby(`${packageRoot}/src/**/*.{png,svg,gif,jpg}`);
-      const pathSearch = new RegExp(`^${packageRoot}/src`);
-      const pathReplace = `${packageRoot}/compiled`;
+      const pathSearch = new RegExp(`^${packageRoot}`);
+      const pathReplace = `${packageRoot}/compiled/${relativePackageRoot}`;
       const promises = staticFiles.map(file => fs.copyFile(file, file.replace(pathSearch, pathReplace)));
       await Promise.all(promises);
     });
@@ -73,13 +73,15 @@ const buildTaskRunner: TaskRunner<PackageBuildOptions> = async ({ scope }) => {
   }
 
   const scopes = scope.split(',').map(async s => {
-    const packageRoot = path.resolve(__dirname, `../../../../grafana-${s}`);
+    const repoRoot = path.resolve(__dirname, '../../../../../');
+    const relativePackageRoot = `packages/grafana-${s}`;
+    const packageRoot = `${repoRoot}/${relativePackageRoot}`;
     const packageDist = `${packageRoot}/dist`;
     const pkg = require(`${packageRoot}/package.json`);
     console.log(chalk.yellow(`Building ${pkg.name} (package.json version: ${pkg.version})`));
     await clean(packageRoot);
     await compile(packageRoot);
-    await moveStaticFiles(packageRoot, pkg);
+    await moveStaticFiles(packageRoot, pkg, relativePackageRoot);
     await bundle(packageRoot);
     await preparePackage(packageRoot, pkg);
     await moveFiles(packageRoot, packageDist);
