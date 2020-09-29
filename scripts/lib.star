@@ -856,6 +856,19 @@ def get_windows_steps(edition, version_mode, is_downstream=False):
                 'initialize',
             ],
         })
+    elif version_mode == 'pr':
+        installer_commands = [
+            'cp C:\\App\\nssm-2.24.zip .',
+            '.\\grabpl.exe windows-installer --edition {} --build-id $$env:{}'.format(edition, build_no),
+        ]
+        steps.append({
+            'name': 'build-windows-installer',
+            'image': wix_image,
+            'commands': installer_commands,
+            'depends_on': [
+                'initialize',
+            ],
+        })
 
     if edition == 'enterprise':
         # For enterprise, we have to clone both OSS and enterprise and merge the latter into the former
