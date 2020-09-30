@@ -1,5 +1,5 @@
 +++
-title = "Grafana documentation"
+title = "LOG ACOUNT DOC"
 description = "Guides, Installation and Feature Documentation"
 keywords = ["grafana", "installation", "documentation"]
 type = "docs"
